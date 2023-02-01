@@ -50,13 +50,12 @@ def clone_repo(org_name: str, repo_name: str):
     return git.Repo.clone_from(remote_url, repo_name)
 
 
-def commit_all_repo(repo: git.Repo, commit_msg: str, author: git.Actor = None):
+def commit_all_repo(repo: git.Repo, commit_msg: str):
     print(f"  - Commit all files in repo {repo.working_tree_dir}")
-    # Add all files, just like "git add ."
-    repo.index.add(["."])
-    repo.index.commit(commit_msg, author=author, committer=author)
-    origin = repo.remote(name="origin")
-    origin.push()
+    # Use git directly
+    repo.git.add(".")
+    repo.git.commit(m=commit_msg)
+    repo.git.push()
 
 
 async def fetch_asset(session: aiohttp.ClientSession, release: str,
@@ -79,9 +78,8 @@ async def fetch_asset(session: aiohttp.ClientSession, release: str,
         with open(os.path.join(repo.working_tree_dir, "README.md"), "w") as f:
             f.write(f"{variant.capitalize} - version {release}")
 
-        commit_all_repo(repo, commit_msg=f"Update {variant}-{release}",
-                        author=git.Actor("Kien Nguyen Tuan",
-                                         "kiennt2609@gmail.com"))  # hardcode
+        commit_all_repo(repo,
+                        commit_msg=f"Update {variant}-{release}")
     # Do clean to free disk space
     shutil.rmtree(variant)
 

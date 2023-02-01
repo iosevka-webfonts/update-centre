@@ -25,6 +25,8 @@ jobs:
         run: |
           # https://stackoverflow.com/questions/59282476/error-rpc-failed-curl-92-http-2-stream-0-was-not-closed-cleanly-protocol-erro
           git config --global http.version HTTP/1.1
+          git config --global user.name 'Kien Nguyen'
+          git config --global user.email 'kiennt2609@gmail.com'
           python -m pip install -r requirements.txt
           python update.py
         env:
