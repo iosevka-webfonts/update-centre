@@ -58,6 +58,19 @@ def commit_all_repo(repo: git.Repo, commit_msg: str):
     repo.git.push()
 
 
+def check_release(latest_release, release_path):
+    with open(release_path) as f:
+        current_release = f.read()
+        if current_release == latest_release:
+            print(f"  - Release {current_release} is up-date-to, skip...")
+            return True
+
+        # Update the latest release
+        with open(release_path, "w") as f:
+            f.write(latest_release)
+        return False
+
+
 async def fetch_asset(session: aiohttp.ClientSession, release: str,
                       asset_name: str, asset_download_url: str):
     # Preprocess variant name, for example:
@@ -67,6 +80,13 @@ async def fetch_asset(session: aiohttp.ClientSession, release: str,
     print(f"* Updating repo {variant}:")
     # Hardcode here!
     repo = clone_repo(org_name="iosevka-webfonts", repo_name=variant)
+
+    # Check if the release already up-to-date
+    if check_release(release, os.path.join(repo.working_tree_dir, "LATEST_RELEASE")):
+        # Do clean to free disk space
+        shutil.rmtree(variant)
+        return
+
     print(f"  - Downloading asset {asset_name}")
     async with session.get(asset_download_url) as resp:
         zip_resp = await resp.read()
@@ -80,6 +100,7 @@ async def fetch_asset(session: aiohttp.ClientSession, release: str,
 
         commit_all_repo(repo,
                         commit_msg=f"Update {variant}-{release}")
+
     # Do clean to free disk space
     shutil.rmtree(variant)
 
@@ -105,15 +126,6 @@ async def fetch():
         latest_url = "http://api.github.com/repos/be5invis/Iosevka/releases/latest"
         async with session.get(latest_url) as resp:
             latest = await resp.json()
-            # Check if the release already exists
-            if os.path.exists("LATEST_RELEASE"):
-                with open("LATEST_RELEASE") as f:
-                    current_version = f.read()
-                    if current_version == latest["tag_name"]:
-                        print(f"Release {current_version} already exists,"
-                              "up-to-date, skip!")
-                        return
-
             print(f"Fetching Iosevka release {latest['tag_name']}...")
 
             for asset in latest["assets"]:
@@ -123,10 +135,6 @@ async def fetch():
                     # Fetch all webfont asset
                     await fetch_asset(session, release, asset["name"],
                                       asset["browser_download_url"])
-
-        # Update the latest release
-        with open("LATEST_RELEASE", "w") as f:
-            f.write(latest["tag_name"])
 
 if __name__ == "__main__":
     print("##########################")
