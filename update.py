@@ -11,6 +11,15 @@ import git
 import github
 
 
+README_TMP = """# {variant} WebFont {release}
+
+## How to use
+
+- Add `<link href="https://iosevkawebfonts.github.io/{variant}/{variant}.css" rel="stylesheet" />` to your `<head>`.
+- Use `fontFamily: '{samplefont}'` or `font-family: '{samplefont}'`.
+"""
+
+
 def clone_repo(org_name: str, repo_name: str):
     print(f"  - Cloning repo {repo_name}")
     g = github.Github(login_or_token=os.getenv("GITHUB_TOKEN"),
@@ -94,9 +103,13 @@ async def fetch_asset(session: aiohttp.ClientSession, release: str,
         z.extractall(f"{variant}")
         print(f"  - Downloaded asset {asset_name} "
               f"and extracted to latest/{variant}")
+
         # Update README
         with open(os.path.join(repo.working_tree_dir, "README.md"), "w") as f:
-            f.write(f"# {variant.capitalize()} WebFont {release}")
+            f.write(README_TMP.format(
+                variant=variant.capitalize(),
+                release=release,
+                samplefont=variant.replace("-", " ").capitalize()))
 
         commit_all_repo(repo,
                         commit_msg=f"Update {variant}-{release}")
