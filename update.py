@@ -16,7 +16,7 @@ README_TMP = """# {variant} WebFont {release}
 ## How to use
 
 - Add `<link href="https://iosevkawebfonts.github.io/{variant}/{variant}.css" rel="stylesheet" />` to your `<head>`.
-- Use `fontFamily: '{samplefont}'` or `font-family: '{samplefont}'`.
+- Use `fontFamily: '{samplefont} Web'` or `font-family: '{samplefont} Web'`.
 """
 
 
