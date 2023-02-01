@@ -47,14 +47,19 @@ def clone_repo(org_name: str, repo_name: str):
     # Clone
     remote_url = f"https://{os.getenv('GITHUB_USERNAME')}:"\
         f"{os.getenv('GITHUB_TOKEN')}@github.com/{org_name}/{repo_name}.git"
-    return git.Repo.clone_from(remote_url, repo_name)
+    repo = git.Repo.clone_from(remote_url, repo_name)
+    repo.config_writer().set_value("user", "name", "Kien Nguyen Tuan")
+    repo.config_writer().set_value("user", "email", "kiennt2609@gmail.com")
+    # https://stackoverflow.com/questions/59282476/error-rpc-failed-curl-92-http-2-stream-0-was-not-closed-cleanly-protocol-erro
+    repo.config_writer().set_value("http", "version", "HTTP/1.1")
+    return repo
 
 
-def commit_all_repo(repo: git.Repo, commit_msg: str, author: git.Actor = None):
+def commit_all_repo(repo: git.Repo, commit_msg: str):
     print(f"  - Commit all files in repo {repo.working_tree_dir}")
     # Add all files, just like "git add ."
     repo.index.add(["."])
-    repo.index.commit(commit_msg, author=author, committer=author)
+    repo.index.commit(commit_msg)
     origin = repo.remote(name="origin")
     origin.push()
 
@@ -79,9 +84,8 @@ async def fetch_asset(session: aiohttp.ClientSession, release: str,
         with open(os.path.join(repo.working_tree_dir, "README.md"), "w") as f:
             f.write(f"{variant.capitalize} - version {release}")
 
-        commit_all_repo(repo, commit_msg=f"Update {variant}-{release}",
-                        author=git.Actor("Kien Nguyen Tuan",
-                                         "kiennt2609@gmail.com"))  # hardcode
+        commit_all_repo(
+            repo, commit_msg=f"Update {variant}-{release}")  # hardcode
     # Do clean to free disk space
     shutil.rmtree(variant)
 
