@@ -77,6 +77,12 @@ def commit_all_repo(repo: git.Repo, commit_msg: str):
 
 
 def check_release(latest_release, release_path):
+    # Force update
+    force_update = os.getenv("FORCE_UPDATE", "false")
+    if force_update.lower() == "true":
+        # simply remove release file
+        os.remove(release_path)
+
     if os.path.exists(release_path):
         with open(release_path) as f:
             current_release = f.read()
