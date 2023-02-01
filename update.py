@@ -76,7 +76,7 @@ async def fetch_asset(session: aiohttp.ClientSession, release: str,
               f"and extracted to latest/{variant}")
         # Update README
         with open(os.path.join(repo.working_tree_dir, "README.md"), "w") as f:
-            f.write(f"{variant.capitalize} - version {release}")
+            f.write(f"# {variant.capitalize()} WebFont {release}")
 
         commit_all_repo(repo,
                         commit_msg=f"Update {variant}-{release}")
