@@ -51,7 +51,7 @@ def clone_repo(org_name: str, repo_name: str):
 def commit_all_repo(repo: git.Repo, commit_msg: str, author: git.Actor = None):
     print(f"  - Commit all files in repo {repo.working_tree_dir}")
     # Add all files, just like "git add ."
-    repo.index.add(all=True)
+    repo.index.add(["."])
     repo.index.commit(commit_msg, author=author, committer=author)
     origin = repo.remote(name="origin")
     origin.push()
