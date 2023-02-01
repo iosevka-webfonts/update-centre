@@ -45,10 +45,9 @@ def clone_repo(org_name: str, repo_name: str):
         )
 
     # Clone
-    print("^^^^",os.getenv("GITHUB_USERNAME"))
     remote_url = f"https://{os.getenv('GITHUB_USERNAME')}:"\
         f"{os.getenv('GITHUB_TOKEN')}@github.com/{org_name}/{repo_name}.git"
-    return git.Repo.clone_from(repo.html_url, repo_name)
+    return git.Repo.clone_from(remote_url, repo_name)
 
 
 def commit_all_repo(repo: git.Repo, commit_msg: str, author: git.Actor = None):
