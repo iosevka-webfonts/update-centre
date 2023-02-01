@@ -11,13 +11,22 @@ import git
 import github
 
 
-README_TMP = """# {variant} WebFont {release}
+def generate_readme(variant, release):
+    readme = """# {variant_cap} WebFont {release}
 
 ## How to use
 
-- Add `<link href="https://iosevkawebfonts.github.io/{variant}/{variant}.css" rel="stylesheet" />` to your `<head>`.
-- Use `fontFamily: '{samplefont} Web'` or `font-family: '{samplefont} Web'`.
+- Add `<link href="https://iosevka-webfonts.github.io/{variant}/{variant_css}.css" rel="stylesheet" />` to your `<head>`.
+- Use `fontFamily: '{samplefont}'` or `font-family: '{samplefont}'`.
 """
+
+    variant_cap = " ".join(e.capitalize() if not e.startswith(
+        "ss") else e.upper() for e in variant.split("-"))
+    variant_css = "-".join([variant.removeprefix("unhinted-"), "unhinted"])
+    samplefont = f"{variant_cap} Web".replace("Unhinted ", "")
+    return readme.format(variant_cap=variant_cap, variant=variant,
+                         variant_css=variant_css, release=release,
+                         samplefont=samplefont)
 
 
 def clone_repo(org_name: str, repo_name: str):
@@ -107,10 +116,7 @@ async def fetch_asset(session: aiohttp.ClientSession, release: str,
 
         # Update README
         with open(os.path.join(repo.working_tree_dir, "README.md"), "w") as f:
-            f.write(README_TMP.format(
-                variant=variant.capitalize(),
-                release=release,
-                samplefont=variant.replace("-", " ").capitalize()))
+            f.write(generate_readme(variant, release))
 
         commit_all_repo(repo,
                         commit_msg=f"Update {variant}-{release}")
