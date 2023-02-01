@@ -22,7 +22,9 @@ def generate_readme(variant, release):
 
     variant_cap = " ".join(e.capitalize() if not e.startswith(
         "ss") else e.upper() for e in variant.split("-"))
-    variant_css = "-".join([variant.removeprefix("unhinted-"), "unhinted"])
+    if "unhinted" in variant:
+        variant_css = "-".join([variant.removeprefix("unhinted-"), "unhinted"])
+    variant_css = variant
     samplefont = f"{variant_cap} Web".replace("Unhinted ", "")
     return readme.format(variant_cap=variant_cap, variant=variant,
                          variant_css=variant_css, release=release,
