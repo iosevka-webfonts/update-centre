@@ -68,16 +68,17 @@ def commit_all_repo(repo: git.Repo, commit_msg: str):
 
 
 def check_release(latest_release, release_path):
-    with open(release_path) as f:
-        current_release = f.read()
-        if current_release == latest_release:
-            print(f"  - Release {current_release} is up-date-to, skip...")
-            return True
+    if os.path.exists(release_path):
+        with open(release_path) as f:
+            current_release = f.read()
+            if current_release == latest_release:
+                print(f"  - Release {current_release} is up-date-to, skip...")
+                return True
 
-        # Update the latest release
-        with open(release_path, "w") as f:
-            f.write(latest_release)
-        return False
+    # Update the latest release
+    with open(release_path, "w") as f:
+        f.write(latest_release)
+    return False
 
 
 async def fetch_asset(session: aiohttp.ClientSession, release: str,
