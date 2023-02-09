@@ -162,7 +162,7 @@ async def fetch():
 
             for asset in latest["assets"]:
                 # Filter webfont
-                if "webfont" in asset["name"]:
+                if "webfont-unhinted" in asset["name"]:
                     release = latest["tag_name"].strip("v")  # number only
                     # Fetch all webfont asset
                     await fetch_asset(session, release, asset["name"],
