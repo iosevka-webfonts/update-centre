@@ -71,6 +71,10 @@ def clone_repo(org_name: str, repo_name: str):
 
 
 def commit_all_repo(repo: git.Repo, commit_msg: str):
+    # If there is nothing changed, ignore it
+    # to handle empty 'git commit'
+    if not repo.git.status(short=True):
+        return
     print(f"  - Commit all files in repo {repo.working_tree_dir}")
     # Use git directly
     repo.git.add(".")
