@@ -16,17 +16,19 @@ def generate_readme(variant, release):
 
 ## How to use
 
-- Add `<link href="https://iosevka-webfonts.github.io/{variant}/{variant_css}.css" rel="stylesheet" />` to your `<head>`.
+- Add `<link href="https://iosevka-webfonts.github.io/{variant_lower}/{variant_css}.css" rel="stylesheet" />` to your `<head>`.
 - Check out the [CSS file](./{variant_css}.css) for browsing the name of font family.
 """
 
+    variant_lower = variant.lower()
     variant_cap = " ".join(e.capitalize() if not e.startswith(
         "ss") else e.upper() for e in variant.split("-"))
     variant_css = variant
     if "Unhinted" in variant:
         variant_css = f"{variant.removeprefix('Unhinted-')}-Unhinted"
     return readme.format(variant_cap=variant_cap, variant=variant,
-                         variant_css=variant_css, release=release)
+                         variant_css=variant_css, release=release,
+                         variant_lower=variant_lower)
 
 
 def clone_repo(org_name: str, repo_name: str):
