@@ -17,18 +17,16 @@ def generate_readme(variant, release):
 ## How to use
 
 - Add `<link href="https://iosevka-webfonts.github.io/{variant}/{variant_css}.css" rel="stylesheet" />` to your `<head>`.
-- Use `fontFamily: '{samplefont}'` or `font-family: '{samplefont}'`.
+- Check out the [CSS file](./{variant_css}.css) for browsing the name of font family.
 """
 
     variant_cap = " ".join(e.capitalize() if not e.startswith(
         "ss") else e.upper() for e in variant.split("-"))
     variant_css = variant
-    if "unhinted" in variant:
-        variant_css = f"{variant.removeprefix('unhinted-')}-unhinted"
-    samplefont = f"{variant_cap} Web".replace("Unhinted ", "")
+    if "Unhinted" in variant:
+        variant_css = f"{variant.removeprefix('Unhinted-')}-Unhinted"
     return readme.format(variant_cap=variant_cap, variant=variant,
-                         variant_css=variant_css, release=release,
-                         samplefont=samplefont)
+                         variant_css=variant_css, release=release)
 
 
 def clone_repo(org_name: str, repo_name: str):
@@ -109,24 +107,25 @@ async def fetch_asset(session: aiohttp.ClientSession, release: str,
     # Iosevka has changed to asset format, like this
     # PkgWebFont-Iosevka-28.1.0.zip -> iosevka
     variant = asset_name.removeprefix("PkgWebFont-").\
-        removesuffix(f"-{release}.zip").lower()
+        removesuffix(f"-{release}.zip")
+    repo_name = variant.lower()
     print(f"* Updating repo {variant}:")
     # Hardcode here!
-    repo = clone_repo(org_name="iosevka-webfonts", repo_name=variant)
+    repo = clone_repo(org_name="iosevka-webfonts", repo_name=repo_name)
 
     # Check if the release already up-to-date
     if check_release(release, os.path.join(repo.working_tree_dir, "LATEST_RELEASE")):
         # Do clean to free disk space
-        shutil.rmtree(variant)
+        shutil.rmtree(repo_name)
         return
 
     print(f"  - Downloading asset {asset_name}")
     async with session.get(asset_download_url) as resp:
         zip_resp = await resp.read()
         z = zipfile.ZipFile(io.BytesIO(zip_resp))
-        z.extractall(f"{variant}")
+        z.extractall(repo_name)
         print(f"  - Downloaded asset {asset_name} "
-              f"and extracted to latest/{variant}")
+              f"and extracted to latest/{repo_name}")
 
         # Update README
         with open(os.path.join(repo.working_tree_dir, "README.md"), "w") as f:
