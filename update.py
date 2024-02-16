@@ -137,7 +137,7 @@ async def fetch_asset(session: aiohttp.ClientSession, release: str,
                         commit_msg=f"Update {variant}-{release}")
 
     # Do clean to free disk space
-    shutil.rmtree(variant)
+    shutil.rmtree(repo_name)
 
 
 async def fetch():
