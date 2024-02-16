@@ -32,5 +32,5 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           GITHUB_USERNAME: 'ntk148v'
-          FORCE_UPDATE: 'true'
+          FORCE_UPDATE: 'false'
         shell: bash
