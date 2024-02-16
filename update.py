@@ -106,8 +106,10 @@ async def fetch_asset(session: aiohttp.ClientSession, release: str,
                       asset_name: str, asset_download_url: str):
     # Preprocess variant name, for example:
     # webfont-iosevka-17.1.0.zip -> iosevka
-    variant = asset_name.removeprefix("webfont-").\
-        removesuffix(f"-{release}.zip")
+    # Iosevka has changed to asset format, like this
+    # PkgWebFont-Iosevka-28.1.0.zip -> iosevka
+    variant = asset_name.removeprefix("PkgWebFont-").\
+        removesuffix(f"-{release}.zip").lower()
     print(f"* Updating repo {variant}:")
     # Hardcode here!
     repo = clone_repo(org_name="iosevka-webfonts", repo_name=variant)
@@ -162,7 +164,7 @@ async def fetch():
 
             for asset in latest["assets"]:
                 # Filter webfont
-                if "webfont" in asset["name"]:
+                if "webfont" in asset["name"].lower():
                     release = latest["tag_name"].strip("v")  # number only
                     # Fetch all webfont asset
                     await fetch_asset(session, release, asset["name"],
@@ -173,6 +175,6 @@ if __name__ == "__main__":
     print("# Get the latest release #")
     print("##########################")
     asyncio.run(fetch())
-    print("########")
-    print("# Done #")
-    print("########")
+    print("##########################")
+    print("#         Done           #")
+    print("##########################")
